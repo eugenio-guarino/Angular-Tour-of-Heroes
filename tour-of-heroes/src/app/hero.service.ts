@@ -7,6 +7,9 @@ import { MessagesService}  from './messages.service';
 // Http symbols
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
+// Error Handling
+import { catchError, map, tap } from 'rxjs/operators';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,14 +28,30 @@ export class HeroService {
   /** GET Heroes from the server*/
   getHeroes(): Observable<Hero[]> {
     // TODO: send the message_after_fetching the heroes
-    this.http.get<Hero[]>(this.heroesUrl)
-    return of (HEROES);
+    return this.http.get<Hero[]>(this.heroesUrl)
+    .pipe(
+      catchError(this.handleError<Hero[]>('getHeroes', []))
+    );
   }
 
   getHero(id: number): Observable<Hero>{
     // TODO: send the message_after_fetching the heroes
     this.messagesService.add( `HeroService: fetched hero id=${id}`);
     return of(HEROES.find(hero => hero.id === id));
+  }
+
+  private handleError<T> (operation = 'operation', result?: T){
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remore logging infrastructure
+      console.error(error); //log to console instead
+
+      // TODO: better job of transforming error for user consumption
+      this.log(`${operation} failed: $(error.message)`);
+
+      // Let the app keep running by returning an empty result
+      return of (result as T);
+    };
   }
 }
 
