@@ -19,7 +19,7 @@ export class HeroService {
     this.messagesService.add(`HeroService: ${message}`);
   }
 
-  private heroesUrl = 'apiheroes'; // URL to web api
+  private heroesUrl = 'api/heroes'; // URL to web api
 
   constructor(
     private http: HttpClient,
@@ -30,6 +30,7 @@ export class HeroService {
     // TODO: send the message_after_fetching the heroes
     return this.http.get<Hero[]>(this.heroesUrl)
     .pipe(
+      tap(_=> this.log('fetched heroes')),
       catchError(this.handleError<Hero[]>('getHeroes', []))
     );
   }
